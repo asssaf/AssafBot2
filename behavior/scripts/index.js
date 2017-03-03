@@ -68,7 +68,7 @@ exports.handle = (client) => {
       // Need to provide weather
       getCurrentWeather(client.getConversationState().weatherCity.value, resultBody => {
 	if (!resultBody || resultBody.cod !== 200) {
-	  console.log('Error getting weather.')
+	  console.log('Error getting weather: ' + resultBody)
 	  callback()
 	  return
 	}
