@@ -44,18 +44,18 @@ exports.handle = (client) => {
       const city = client.getFirstEntityWithRole(client.getMessagePart(), 'city')
 
       if (city) {
-	client.updateConversationState({
-	  weatherCity: city,
-	})
+        client.updateConversationState({
+          weatherCity: city,
+        })
 
-	console.log('User wants the weather in:', city.value)
+        console.log('User wants the weather in:', city.value)
       }
     },
 
     prompt() {
-	// Need to prompt user for city
-	client.addResponse('prompt/weather_city')
-	client.done()
+        // Need to prompt user for city
+        client.addResponse('prompt/weather_city')
+        client.done()
       },
     })
 
@@ -67,29 +67,31 @@ exports.handle = (client) => {
     prompt(callback) {
       // Need to provide weather
       getCurrentWeather(client.getConversationState().weatherCity.value, resultBody => {
-	if (!resultBody || resultBody.cod !== 200) {
-	  console.log('Error getting weather: ' + resultBody)
-	  callback()
-	  return
-	}
+        if (!resultBody || resultBody.cod !== 200) {
+          console.log('Error getting weather: ' + JSON.stringify(resultBody))
+          client.addResponse('apology/unknown_city')
+          client.done()
+          callback()
+          return
+        }
 
-	const weatherDescription = (
-	  resultBody.weather.length > 0 ?
-	  resultBody.weather[0].description :
-	  null
-	)
+        const weatherDescription = (
+          resultBody.weather.length > 0 ?
+          resultBody.weather[0].description :
+          null
+        )
 
-	const weatherData = {
-	  temperature: resultBody.main.temp,
-	  condition: weatherDescription,
-	  city: resultBody.name,
-	}
+        const weatherData = {
+          temperature: resultBody.main.temp,
+          condition: weatherDescription,
+          city: resultBody.name,
+        }
 
-	console.log('sending real weather:', weatherData)
-	client.addResponse('provide_weather/current', weatherData)
-	client.done()
+        console.log('sending real weather:', weatherData)
+        client.addResponse('provide_weather/current', weatherData)
+        client.done()
 
-	callback()
+        callback()
       })
     }
   })
